@@ -54,6 +54,33 @@ const FUENTES = {
   otros: { nombre: 'Otros ingresos', emoji: '💰', color: 'c8' }
 };
 const COLORES = ['c1', 'c2', 'c3', 'c4', 'c5', 'c7', 'c8', 'c9', 'c6'];
+/* Las 17 categorías acordadas. Las palabras con espacio son frases y pesan más al reconocer el texto del chat. */
+const CATS_BASE = [
+  ['viv', 'Casa', '🏠', 'c9', ['alquiler', 'expensas', 'tgi', 'limpieza', 'arredo', 'hogar', 'casa', 'mueble', 'bazar', 'ferreteria']],
+  ['serv', 'Servicios', '💡', 'c2', ['luz', 'gas', 'agua', 'internet', 'celular', 'telefono', 'epe', 'litoral', 'abono', 'personal', 'claro', 'movistar']],
+  ['super', 'Súper', '🛒', 'c1', ['super', 'supermercado', 'coto', 'carrefour', 'almacen', 'verduleria', 'chino', 'carniceria', 'carne', 'dietetica', 'comida casa']],
+  ['perros', 'Perros', '🐶', 'c3', ['perro', 'perros', 'perrito', 'perritos', 'veterinaria', 'vete', 'balanceado', 'comida perros']],
+  ['comida', 'Comida afuera', '🍔', 'c3', ['delivery', 'pedidosya', 'rappi', 'pizza', 'resto', 'almuerzo', 'cena', 'cafe', 'birra', 'helado', 'empanadas', 'hamburguesa', 'sushi', 'desayuno', 'mc', 'mcdonalds', 'juntada', 'gallega', 'popular', 'comida trabajo', 'comida juntada']],
+  ['trans', 'Auto y transporte', '🚗', 'c4', ['nafta', 'combustible', 'sube', 'colectivo', 'taxi', 'uber', 'cabify', 'didi', 'peaje', 'estacionamiento', 'mecanico', 'cochera', 'seguro', 'service', 'auto', 'gomeria', 'lavadero']],
+  ['salud', 'Salud', '💊', 'c8', ['farmacia', 'medico', 'remedio', 'remedios', 'dentista', 'odontologo', 'prepaga', 'gimnasio', 'gym', 'psicologo', 'psicologa', 'psico']],
+  ['ropa', 'Ropa y cuidado', '👕', 'c2', ['zapatillas', 'zapas', 'ropa', 'remera', 'pantalon', 'campera', 'traje', 'peluqueria', 'perfume', 'barberia', 'barber', 'levis', 'zara', 'adidas', 'nike', 'lacoste', 'kevingston']],
+  ['pesca', 'Pesca', '🎣', 'c9', ['pesca', 'pescar', 'anzuelo', 'carnada', 'reel', 'cana', 'comida pesca']],
+  ['salidas', 'Salidas', '🎉', 'c5', ['salida', 'bar', 'cine', 'boliche', 'recital', 'entrada', 'teatro', 'previa']],
+  ['subs', 'Suscripciones', '📺', 'c5', ['netflix', 'spotify', 'disney', 'youtube', 'icloud', 'hbo', 'prime', 'chatgpt', 'claude', 'apple', 'google', 'microsoft', 'gemini', 'suscripcion']],
+  ['edu', 'Educación', '📚', 'c8', ['curso', 'libro', 'facultad', 'clase', 'ingles', 'lectura']],
+  ['regalos', 'Regalos y festejos', '🎁', 'c3', ['regalo', 'regalos', 'cumple', 'festejo', 'casamiento', 'dia de la madre', 'dia del padre']],
+  ['viajes', 'Viajes', '✈️', 'c2', ['viaje', 'vacaciones', 'pasaje', 'hotel', 'assist', 'assistcard', 'valija']],
+  ['dj', 'DJ', '🎧', 'c7', ['parlante', 'cables', 'auriculares', 'controladora', 'vinilo', 'equipo', 'pendrive']],
+  ['quini', 'Quini y kiosco', '🎲', 'c7', ['quini', 'quiniela', 'loteria', 'apuesta', 'cigarros', 'cigarrillos', 'puchos', 'kiosco']],
+  ['otros', 'Otros', '📦', 'c6', ['donacion', 'varios', 'impuestos tarjeta']]
+];
+/* Movimientos que se anotan pero no son gasto ni ingreso */
+const TIPOS_OTRO = {
+  tarjeta: { nombre: 'Pago de tarjeta', emoji: '💳', color: 'c4' },
+  saldo: { nombre: 'Saldé cuentas', emoji: '🤝', color: 'c7' },
+  cobro: { nombre: 'Me devolvieron', emoji: '↩️', color: 'c8' }
+};
+const esOtro = t => !!TIPOS_OTRO[t];
 
 function defaults() {
   const C = (id, nombre, emoji, color, k) => ({ id, nombre, emoji, color, presupuesto: 0, k });
@@ -62,24 +89,10 @@ function defaults() {
     config: {
       ahorroPct: 20, metaAhorro: 'm-emerg', metaDJ: 'm-emerg',
       extraCasa: 'm-casa', extraCorto: 'm-viaje', extraPctCasa: 70,
-      parejaOn: true, pareja: 'Melani', miParte: 50,
+      parejaOn: true, pareja: 'Melani', miParte: 50, catsV: 2,
       tema: 'auto', ultimoRespaldo: null, ultimoMedio: 'Débito', creado: today()
     },
-    categorias: [
-      C('viv', 'Vivienda', '🏠', 'c9', ['alquiler', 'expensas', 'casa']),
-      C('serv', 'Servicios', '💡', 'c2', ['luz', 'gas', 'agua', 'internet', 'celular', 'telefono', 'epe', 'litoral']),
-      C('super', 'Súper', '🛒', 'c1', ['super', 'supermercado', 'coto', 'carrefour', 'almacen', 'verduleria', 'chino', 'carniceria', 'dietetica', 'kiosco']),
-      C('comida', 'Comida afuera', '🍔', 'c3', ['delivery', 'pedidosya', 'rappi', 'pizza', 'resto', 'almuerzo', 'cena', 'cafe', 'birra', 'helado', 'empanadas', 'hamburguesa', 'sushi']),
-      C('trans', 'Transporte', '🚗', 'c4', ['nafta', 'sube', 'colectivo', 'taxi', 'uber', 'cabify', 'didi', 'peaje', 'estacionamiento', 'mecanico', 'cochera', 'seguro']),
-      C('salud', 'Salud', '💊', 'c8', ['farmacia', 'medico', 'remedio', 'remedios', 'dentista', 'prepaga', 'gimnasio', 'gym', 'psicologo']),
-      C('ropa', 'Ropa y cuidado', '👕', 'c2', ['zapatillas', 'ropa', 'remera', 'pantalon', 'campera', 'peluqueria', 'perfume', 'barberia']),
-      C('salidas', 'Salidas', '🎉', 'c5', ['salida', 'bar', 'cine', 'boliche', 'recital', 'entrada', 'teatro', 'previa']),
-      C('subs', 'Suscripciones', '📺', 'c5', ['netflix', 'spotify', 'disney', 'youtube', 'icloud', 'hbo', 'prime', 'chatgpt']),
-      C('dj', 'DJ', '🎧', 'c7', ['parlante', 'cables', 'auriculares', 'controladora', 'vinilo', 'equipo', 'pendrive']),
-      C('edu', 'Educación', '📚', 'c8', ['curso', 'libro', 'facultad', 'clase', 'ingles']),
-      C('regalos', 'Regalos', '🎁', 'c3', ['regalo', 'cumple']),
-      C('otros', 'Otros', '📦', 'c6', [])
-    ],
+    categorias: CATS_BASE.map(([id, nombre, emoji, color, k]) => C(id, nombre, emoji, color, k)),
     movimientos: [],
     fijos: [],
     metas: [
@@ -99,9 +112,24 @@ function load() {
 }
 function migrate() {
   const d = defaults();
+  const catsV = (S.config && S.config.catsV) || 1;
   S.config = Object.assign({}, d.config, S.config || {});
   if (!Array.isArray(S.categorias) || !S.categorias.length) S.categorias = d.categorias;
   if (!S.categorias.find(c => c.id === 'otros')) S.categorias.push(d.categorias.find(c => c.id === 'otros'));
+  if (catsV < 2) {
+    // Pasar a las 17 categorías: renombra las viejas (si no las cambiaste), suma las nuevas y actualiza palabras
+    const viejos = { viv: 'Vivienda', trans: 'Transporte', regalos: 'Regalos' };
+    const orden = [];
+    for (const [id, nombre, emoji, color, k] of CATS_BASE) {
+      let c = S.categorias.find(x => x.id === id);
+      if (!c) c = { id, nombre, emoji, color, presupuesto: 0, k };
+      else { if (viejos[id] && c.nombre === viejos[id]) c.nombre = nombre; c.k = [...new Set([...k, ...(c.k || [])])].filter(w => !(id === 'super' && w === 'kiosco')); }
+      orden.push(c);
+    }
+    const propias = S.categorias.filter(x => !CATS_BASE.some(b => b[0] === x.id));
+    S.categorias = [...orden.slice(0, -1), ...propias, orden[orden.length - 1]];
+    S.config.catsV = 2;
+  }
   S.movimientos = Array.isArray(S.movimientos) ? S.movimientos : [];
   S.fijos = Array.isArray(S.fijos) ? S.fijos : [];
   S.metas = Array.isArray(S.metas) ? S.metas : d.metas;
@@ -115,7 +143,8 @@ function save() {
 const cat = id => S.categorias.find(c => c.id === id) || S.categorias.find(c => c.id === 'otros');
 const meta = id => S.metas.find(m => m.id === id);
 const pareja = () => S.config.parejaOn && S.config.pareja ? S.config.pareja : null;
-const parteMia = m => m.compartido ? m.monto * S.config.miParte / 100 : m.monto;
+/* Tu parte de un gasto: si es con Meli, tu mitad; si alguien más te debe una parte, se resta */
+const parteMia = m => Math.max(0, (m.compartido && pareja() ? m.monto * S.config.miParte / 100 : m.monto) - (m.deben ? Number(m.deben.monto) || 0 : 0));
 const movsMes = k => S.movimientos.filter(m => mkey(m.fecha) === k);
 const sortMovs = arr => arr.slice().sort((a, b) => b.fecha.localeCompare(a.fecha) || (b.creado || 0) - (a.creado || 0));
 
@@ -128,19 +157,43 @@ function resumenMes(k) {
   for (const m of movsMes(k)) {
     if (m.tipo === 'ingreso') { ing += m.monto; if (m.fuente === 'dj') dj += m.monto; }
     else if (m.tipo === 'ahorro') aho += m.monto;
+    else if (m.tipo !== 'gasto') continue;
     else if (m.fijoId) fij += parteMia(m);
     else vari += parteMia(m);
   }
   const pend = k === mkey(today()) ? pendientes(k).reduce((a, f) => a + (f.compartido ? f.monto * S.config.miParte / 100 : f.monto), 0) : 0;
   return { ing, aho, fij, vari, pend, dj, gastos: fij + vari, disp: ing - aho - fij - pend - vari };
 }
-function balance(k) {
+/* Cuentas con Meli. Suma todo lo anotado hasta hoy (no se reinicia cada mes): cuando saldan, se anota y vuelve a cero.
+   debe > 0: ella te debe. debe < 0: le debés vos. */
+const tocaPareja = m => m.tipo === 'saldo' || (m.tipo === 'gasto' && !!pareja() && (!!m.compartido || m.pagoPor === 'pareja'));
+function deudaPareja(m) {
   const p = S.config.miParte / 100;
-  const list = sortMovs(movsMes(k).filter(m => m.tipo === 'gasto' && m.compartido));
-  let yo = 0, ella = 0;
-  for (const m of list) { if (m.pagoPor === 'pareja') ella += m.monto; else yo += m.monto; }
-  return { list, yo, ella, total: yo + ella, debe: yo * (1 - p) - ella * p };
+  if (m.tipo === 'saldo') return m.dir === 'ella' ? -m.monto : m.monto;
+  if (m.tipo !== 'gasto' || !pareja()) return 0;
+  if (m.pagoPor === 'pareja') return -(m.compartido ? m.monto * p : m.monto);
+  return m.compartido ? m.monto * (1 - p) : 0;
 }
+function balance(k) {
+  const hoy = today(), all = S.movimientos.filter(m => m.fecha <= hoy && tocaPareja(m));
+  const list = sortMovs(movsMes(k).filter(tocaPareja));
+  let yo = 0, ella = 0;
+  for (const m of list) if (m.tipo === 'gasto' && m.compartido) { if (m.pagoPor === 'pareja') ella += m.monto; else yo += m.monto; }
+  return { list, yo, ella, total: yo + ella, debe: Math.round(all.reduce((a, m) => a + deudaPareja(m), 0) * 100) / 100, hay: all.length > 0 };
+}
+/* Lo que te deben otras personas: suma lo que marcaste como "me deben" y resta lo que te devolvieron */
+function deudores() {
+  const hoy = today(), acc = {};
+  const key = q => norm(q).trim() || '?';
+  const sum = (q, v) => { const k = key(q); acc[k] = acc[k] || { nombre: cap((q || 'Alguien').trim()), monto: 0 }; acc[k].monto += v; };
+  for (const m of S.movimientos) {
+    if (m.fecha > hoy) continue;
+    if (m.tipo === 'gasto' && m.deben && m.deben.monto > 0) sum(m.deben.quien, Number(m.deben.monto));
+    if (m.tipo === 'cobro') sum(m.quien, -m.monto);
+  }
+  return Object.values(acc).filter(x => Math.abs(x.monto) >= 1).sort((a, b) => b.monto - a.monto);
+}
+const nombresDeudores = () => [...new Set(S.movimientos.map(m => m.tipo === 'cobro' ? m.quien : m.deben ? m.deben.quien : '').filter(Boolean).map(x => cap(x.trim())))];
 function metaJuntado(id) { const m = meta(id); return (m ? Number(m.inicial) || 0 : 0) + S.movimientos.filter(x => x.tipo === 'ahorro' && x.metaId === id).reduce((a, x) => a + x.monto, 0); }
 function catUso() { const u = {}; for (const m of S.movimientos) if (m.tipo === 'gasto' && !m.fijoId) u[m.categoriaId] = (u[m.categoriaId] || 0) + 1; return u; }
 function catsOrdenadas() { const u = catUso(); return S.categorias.slice().sort((a, b) => (u[b.id] || 0) - (u[a.id] || 0)); }
@@ -171,6 +224,20 @@ function autoAhorroTexto(fuente) {
 const W_CRED = ['tarjeta', 'credito', 'visa', 'master', 'mastercard', 'amex', 'naranja', 'cuotas', 'cuota'];
 const W_STOP = new Set(['en', 'de', 'con', 'el', 'la', 'los', 'las', 'un', 'una', 'para', 'por', 'y', 'a', 'mp', 'mercado', 'pago', 'pague', 'efectivo', 'cash', 'debito', 'transf', 'transferencia', 'compartido', 'compartida', 'mitad', 'ayer', 'anteayer', 'hoy', 'ahorro', 'ahorre', 'guarde', 'cobre', 'cobro', 'ingreso', 'pesos', '$', ...W_CRED]);
 
+const W_EXTRA = ['debe', 'deben', 'me', 'salde', 'saldamos', 'saldar', 'saldo', 'resumen', 'devolvio', 'devolvieron', 'transfirio', 'paso', 'presto', 'bbva', 'santander', 'le', 'transferi', 'mio', 'mia', 'es'];
+/* Elige la categoría que más coincide con el texto (las frases como "comida casa" pesan más que una palabra suelta) */
+function catDeTexto(words, frase) {
+  let best = null, bs = 0; const f = ' ' + frase + ' ';
+  for (const c of S.categorias) {
+    let sc = 0;
+    for (const k of [...(c.k || []), ...norm(c.nombre).split(/\s+/).filter(p => p.length > 2)]) {
+      const kn = norm(k);
+      if (kn.includes(' ')) { if (f.includes(' ' + kn + ' ')) sc += 3; } else if (words.includes(kn)) sc += 1;
+    }
+    if (sc > bs) { bs = sc; best = c; }
+  }
+  return best;
+}
 function parseChat(text) {
   const raw = String(text || '').trim(); if (!raw) return null;
   const lower = raw.toLowerCase();
@@ -181,16 +248,33 @@ function parseChat(text) {
   const rest = (lower.slice(0, m.index) + ' ' + lower.slice(m.index + m[0].length));
   const toks = rest.split(/\s+/).filter(Boolean);
   const words = toks.map(norm);
+  const frase = words.join(' ');
   const has = w => words.includes(w);
   const pz = pareja() ? norm(pareja()) : null;
+  const esPareja = w => !!pz && w.length >= 3 && (w === pz || (w.length <= pz.length && w.slice(0, 3) === pz.slice(0, 3)));
+  const conocidos = nombresDeudores().map(norm);
+  const stop = new Set([...W_STOP, ...W_EXTRA]);
+  const libres = () => words.filter(w => !stop.has(w) && !esPareja(w) && !/^\d+$/.test(w));
+  const nombreTras = w => { const i = words.indexOf(w); for (const x of [...words.slice(i + 1), ...words.slice(0, i).reverse()]) if (!stop.has(x) && !esPareja(x) && !/^\d+$/.test(x)) return x; return ''; };
+  const ingFuente = has('sueldo') || has('aguinaldo') || has('bono') || has('dj');
+  const meDieron = (has('me') && (has('pago') || has('transfirio') || has('paso') || has('devolvio'))) || has('devolvio') || has('devolvieron');
 
   const F = blankForm();
   F.monto = String(Math.round(monto * 100) / 100).replace('.', ',');
   if (has('ayer')) F.fecha = ymd(new Date(Date.now() - 864e5));
   if (has('anteayer')) F.fecha = ymd(new Date(Date.now() - 2 * 864e5));
+  let quitar = [];
 
   const djIngreso = has('dj') && words.some(w => ['fecha', 'toque', 'evento', 'show', 'cobre', 'cumple', 'casamiento', 'fiesta'].includes(w));
-  if (has('sueldo') || has('aguinaldo') || has('bono') || has('cobre') || has('cobro') || has('ingreso') || djIngreso) {
+  const aPareja = words.some(esPareja);
+  if (pz && (has('salde') || has('saldamos') || has('saldar') || has('saldo') || (meDieron && aPareja) || ((has('pague') || has('transferi')) && aPareja && !catDeTexto(words, frase)))) {
+    F.tipo = 'saldo'; F.dir = meDieron ? 'ella' : 'yo';
+  } else if (has('resumen') || ((has('pague') || has('pago')) && !aPareja && !catDeTexto(words, frase) && ['tarjeta', 'visa', 'master', 'mastercard', 'bbva', 'santander', 'amex', 'naranja'].some(has))) {
+    F.tipo = 'tarjeta';
+  } else if (!ingFuente && !djIngreso && libres().length && (meDieron || ((has('cobre') || has('cobro')) && libres().some(w => conocidos.includes(w))))) {
+    F.tipo = 'cobro'; const q = libres().find(w => conocidos.includes(w)) || libres()[0];
+    F.quien = cap(toks[words.indexOf(q)]); quitar.push(q);
+  } else if (has('sueldo') || has('aguinaldo') || has('bono') || has('cobre') || has('cobro') || has('ingreso') || djIngreso) {
     F.tipo = 'ingreso';
     F.fuente = has('sueldo') ? 'sueldo' : has('aguinaldo') ? 'aguinaldo' : has('bono') ? 'bono' : (has('dj') || djIngreso) ? 'dj' : 'otros';
     F.auto = F.fuente !== 'otros';
@@ -200,8 +284,7 @@ function parseChat(text) {
     const mt = S.metas.find(x => norm(x.nombre).split(/\s+/).some(p => p.length > 3 && words.includes(p)));
     F.metaId = mt ? mt.id : S.config.metaAhorro;
   } else {
-    const c = S.categorias.find(c => [...(c.k || []), ...norm(c.nombre).split(/\s+/).filter(p => p.length > 2)].some(k => words.includes(norm(k))))
-      || (has('dj') ? cat('dj') : null);
+    const c = catDeTexto(words, frase) || (has('dj') ? cat('dj') : null);
     F.categoriaId = c ? c.id : 'otros';
     if (words.some(w => W_CRED.includes(w))) {
       F.medio = 'Tarjeta de crédito';
@@ -211,16 +294,21 @@ function parseChat(text) {
     else if (has('efectivo') || has('cash')) F.medio = 'Efectivo';
     else if (has('debito')) F.medio = 'Débito';
     else if (has('transf') || has('transferencia')) F.medio = 'Transferencia';
-    const esPareja = w => pz && w.length >= 3 && (w === pz || (w.length <= pz.length && w.slice(0, 3) === pz.slice(0, 3)));
-    if (pz && (words.some(esPareja) || has('compartido') || has('compartida') || has('mitad'))) {
+    // Alguien más te debe una parte: "debe joaco", o un nombre que ya usaste antes
+    const dq = (has('debe') || has('deben')) ? nombreTras(has('debe') ? 'debe' : 'deben') : (words.find(w => conocidos.includes(w) && !esPareja(w)) || '');
+    if (dq) { F.debeOn = true; F.debeQuien = cap(toks[words.indexOf(dq)]); quitar.push(dq); }
+    if (pz && (aPareja || has('compartido') || has('compartida') || (has('mitad') && !dq))) {
       F.compartido = true;
-      if (has('pago') && !has('mercado') && words.indexOf('pago') > -1) F.pagoPor = 'pareja';
+      if (has('pago') && !has('mercado')) F.pagoPor = 'pareja';
+      // "pagó Meli, es mío": lo pagó ella pero el gasto es todo tuyo
+      if (F.pagoPor === 'pareja' && (has('mio') || has('mia'))) F.compartido = false;
     }
   }
-  const skip = new Set([...W_STOP, ...(F.compartido ? words.filter(w => pz && w.length >= 3 && w.slice(0, 3) === pz.slice(0, 3)) : []), String(F.cuotas)]);
+  const skip = new Set([...W_STOP, ...W_EXTRA, ...quitar, ...words.filter(esPareja), String(F.cuotas)]);
   if (F.tipo === 'ingreso') ['sueldo', 'aguinaldo', 'bono', 'dj', 'fecha'].forEach(w => skip.add(w));
   F.nota = cap(toks.filter((t, i) => !skip.has(words[i])).join(' '));
   if (F.tipo === 'gasto' && F.nota && norm(cat(F.categoriaId).nombre).startsWith(norm(F.nota))) F.nota = '';
+  if (F.tipo === 'tarjeta' && !F.nota) F.nota = ['bbva', 'santander', 'visa', 'master', 'mastercard', 'amex', 'naranja'].filter(has).map(w => w.length <= 4 ? w.toUpperCase() : cap(w)).join(' ');
   return F;
 }
 
@@ -228,29 +316,38 @@ function parseChat(text) {
 let F = null;
 function blankForm(tipo) {
   const c0 = catsOrdenadas()[0];
-  return { id: null, tipo: tipo || 'gasto', monto: '', categoriaId: c0 ? c0.id : 'otros', medio: S.config.ultimoMedio || 'Débito', cuotas: 1, compartido: false, pagoPor: 'yo', fecha: today(), nota: '', fuente: 'sueldo', auto: true, metaId: S.config.metaAhorro, retiro: false, fijoId: null };
+  return { id: null, tipo: tipo || 'gasto', monto: '', categoriaId: c0 ? c0.id : 'otros', medio: S.config.ultimoMedio || 'Débito', cuotas: 1, compartido: false, pagoPor: 'yo', fecha: today(), nota: '', fuente: 'sueldo', auto: true, metaId: S.config.metaAhorro, retiro: false, fijoId: null, debeOn: false, debeQuien: '', debeMonto: '', dir: 'yo', quien: '' };
 }
 function formFromMov(m) {
-  return { id: m.id, tipo: m.tipo, monto: String(Math.abs(m.monto)).replace('.', ','), categoriaId: m.categoriaId || 'otros', medio: m.medio || 'Débito', cuotas: 1, compartido: !!m.compartido, pagoPor: m.pagoPor || 'yo', fecha: m.fecha, nota: m.nota || '', fuente: m.fuente || 'otros', auto: !!m.auto, metaId: m.metaId || S.config.metaAhorro, retiro: m.tipo === 'ahorro' && m.monto < 0, fijoId: m.fijoId || null, grupoId: m.grupoId, cuotaNumero: m.cuotaNumero, cuotasTot: m.cuotas };
+  return { id: m.id, tipo: m.tipo, monto: String(Math.abs(m.monto)).replace('.', ','), categoriaId: m.categoriaId || 'otros', medio: m.medio || 'Débito', cuotas: 1, compartido: !!m.compartido, pagoPor: m.pagoPor || 'yo', fecha: m.fecha, nota: m.nota || '', fuente: m.fuente || 'otros', auto: !!m.auto, metaId: m.metaId || S.config.metaAhorro, retiro: m.tipo === 'ahorro' && m.monto < 0, fijoId: m.fijoId || null, grupoId: m.grupoId, cuotaNumero: m.cuotaNumero, cuotasTot: m.cuotas, debeOn: !!m.deben, debeQuien: m.deben ? m.deben.quien || '' : '', debeMonto: m.deben ? String(m.deben.monto).replace('.', ',') : '', dir: m.dir || 'yo', quien: m.quien || '' };
 }
 function movTitulo(m) {
   if (m.tipo === 'gasto') { const c = cat(m.categoriaId); return (m.nota || (m.fijoId ? (S.fijos.find(f => f.id === m.fijoId)?.nombre || c.nombre) : c.nombre)) + (m.cuotas > 1 ? ` · cuota ${m.cuotaNumero} de ${m.cuotas}` : ''); }
   if (m.tipo === 'ingreso') return m.nota || FUENTES[m.fuente]?.nombre || 'Ingreso';
+  if (m.tipo === 'tarjeta') return m.nota ? 'Pago de tarjeta · ' + m.nota : 'Pago de tarjeta';
+  if (m.tipo === 'saldo') return m.dir === 'ella' ? `${pareja() || 'Tu pareja'} te pagó` : `Le pagaste a ${pareja() || 'tu pareja'}`;
+  if (m.tipo === 'cobro') return `${m.quien || 'Alguien'} te devolvió`;
   return m.nota || ('Ahorro: ' + (meta(m.metaId)?.nombre || 'meta'));
 }
 function movVisual(m) {
   if (m.tipo === 'gasto') { const c = cat(m.categoriaId); return { e: c.emoji, c: c.color }; }
   if (m.tipo === 'ingreso') { const f = FUENTES[m.fuente] || FUENTES.otros; return { e: f.emoji, c: f.color }; }
+  if (esOtro(m.tipo)) { const o = TIPOS_OTRO[m.tipo]; return { e: o.emoji, c: o.color }; }
   const mt = meta(m.metaId); return { e: mt ? mt.emoji : '🐷', c: 'accent' };
 }
 function vMovForm() {
   const t = F.tipo, n = parseNum(F.monto), pz = pareja();
   const editing = !!F.id;
   let h = `<div class="grab"></div><div class="shead"><button data-act="close">Cancelar</button><b>${editing ? 'Editar' : 'Nuevo'}</b><button data-act="saveMov">Guardar</button></div>`;
-  if (!editing) h += `<div class="types">${['gasto', 'ingreso', 'ahorro'].map(x => `<button class="${t === x ? 'on' : ''}" data-act="ftipo" data-v="${x}">${cap(x)}</button>`).join('')}</div>`;
+  if (!editing) h += `<div class="types">${[['gasto', 'Gasto'], ['ingreso', 'Ingreso'], ['ahorro', 'Ahorro'], ['tarjeta', 'Otro']].map(([x, l]) => `<button class="${t === x || (x === 'tarjeta' && esOtro(t)) ? 'on' : ''}" data-act="ftipo" data-v="${x}">${l}</button>`).join('')}</div>`;
+  if (!editing && esOtro(t)) h += `<div class="meta">${Object.entries(TIPOS_OTRO).filter(([x]) => x !== 'saldo' || pz).map(([x, o]) => `<button class="chip ${t === x ? 'on' : ''}" data-act="ftipo" data-v="${x}">${o.emoji} ${x === 'saldo' ? 'Saldé con ' + esc(pz) : o.nombre}</button>`).join('')}</div>`;
   let sub = '';
-  if (t === 'gasto' && F.medio === 'Tarjeta de crédito' && F.cuotas > 1 && n) sub = `${F.cuotas} cuotas de ${money(n / F.cuotas)}`;
-  if (t === 'gasto' && F.compartido && n) sub = (sub ? sub + ' · ' : '') + `tu parte ${money(n * S.config.miParte / 100)}`;
+  if (t === 'gasto' && n) {
+    const cu = F.medio === 'Tarjeta de crédito' && F.cuotas > 1 && !editing ? F.cuotas : 1;
+    if (cu > 1) sub = `${cu} cuotas de ${money(n / cu)}`;
+    const tmp = formGasto(n / cu, cu);
+    if (tmp.compartido || tmp.deben || tmp.pagoPor === 'pareja') sub = (sub ? sub + ' · ' : '') + `tu parte ${money(parteMia(tmp))}${cu > 1 ? ' por cuota' : ''}`;
+  }
   h += `<div class="amount num ${n ? '' : 'zero'}" id="fAmount">${F.retiro ? '−' : ''}${money(n, n % 1 !== 0)}${sub ? `<small>${sub}</small>` : ''}</div>`;
   if (t === 'gasto') {
     h += `<div class="cats">${catsOrdenadas().map(c => `<button class="cat ${F.categoriaId === c.id ? 'on' : ''}" data-act="fcat" data-v="${c.id}"><span class="ico" style="--c:var(--${c.color})">${c.emoji}</span><span>${esc(c.nombre)}</span></button>`).join('')}</div>`;
@@ -258,16 +355,33 @@ function vMovForm() {
     if (F.medio === 'Tarjeta de crédito' && !editing) h += `<div class="optrow"><span>Cuotas</span><div class="stepper"><button data-act="fcuota" data-v="-1" aria-label="Menos cuotas">−</button><b class="num">${F.cuotas}</b><button data-act="fcuota" data-v="1" aria-label="Más cuotas">+</button></div></div>`;
     if (editing && F.cuotasTot > 1) h += `<div class="optrow muted"><span>Cuota ${F.cuotaNumero} de ${F.cuotasTot}. Lo que cambies acá vale solo para esta cuota.</span></div>`;
     if (pz) {
-      h += `<div class="optrow"><span>👫 Compartido con ${esc(pz)}</span><button class="tog ${F.compartido ? 'on' : ''}" data-act="fcomp" aria-label="Compartido"></button></div>`;
-      if (F.compartido) h += `<div class="optrow"><span>¿Quién pagó?</span><div class="seg"><button class="${F.pagoPor !== 'pareja' ? 'on' : ''}" data-act="fpago" data-v="yo">Yo</button><button class="${F.pagoPor === 'pareja' ? 'on' : ''}" data-act="fpago" data-v="pareja">${esc(pz)}</button></div></div>`;
+      h += `<div class="optrow"><span>👫 Compartido con ${esc(pz)} <span class="muted">(mitad)</span></span><button class="tog ${F.compartido ? 'on' : ''}" data-act="fcomp" aria-label="Compartido con ${esc(pz)}"></button></div>`;
+      h += `<div class="optrow"><span>¿Quién pagó?</span><div class="seg"><button class="${F.pagoPor !== 'pareja' ? 'on' : ''}" data-act="fpago" data-v="yo">Yo</button><button class="${F.pagoPor === 'pareja' ? 'on' : ''}" data-act="fpago" data-v="pareja">${esc(pz)}</button></div></div>`;
+      if (F.pagoPor === 'pareja' && !F.compartido) h += `<div class="optrow muted"><span>Es todo tuyo y lo pagó ${esc(pz)}: se suma entero a lo que le debés.</span></div>`;
+    }
+    h += `<div class="optrow"><span>🙋 Alguien me debe una parte</span><button class="tog ${F.debeOn ? 'on' : ''}" data-act="fdebe" aria-label="Alguien me debe una parte"></button></div>`;
+    if (F.debeOn) {
+      const cu = F.medio === 'Tarjeta de crédito' && F.cuotas > 1 && !editing ? F.cuotas : 1;
+      h += `<div class="fields"><label for="fDebQ">¿Quién?</label><input id="fDebQ" list="dlNombres" value="${esc(F.debeQuien)}" placeholder="Ej: Joaco" maxlength="24" autocapitalize="words"><datalist id="dlNombres">${nombresDeudores().map(x => `<option value="${esc(x)}">`).join('')}</datalist>`;
+      h += `<label for="fDebM">¿Cuánto te debe?${cu > 1 ? ' (del total)' : editing && F.cuotasTot > 1 ? ' (de esta cuota)' : ''}</label><input id="fDebM" inputmode="decimal" value="${esc(F.debeMonto)}" placeholder="${n ? 'La mitad: ' + money(n / 2) : 'Vacío = la mitad'}"></div>`;
     }
   } else if (t === 'ingreso') {
     h += `<div class="meta">${Object.entries(FUENTES).map(([k, f]) => `<button class="chip ${F.fuente === k ? 'on' : ''}" data-act="ffuente" data-v="${k}">${f.emoji} ${f.nombre.replace(' ingresos', '')}</button>`).join('')}</div>`;
     const tx = autoAhorroTexto(F.fuente);
     if (tx) h += `<div class="optrow"><span>🐷 ${esc(tx)}</span><button class="tog ${F.auto ? 'on' : ''}" data-act="fauto" aria-label="Ahorro automático"></button></div>`;
-  } else {
+  } else if (t === 'ahorro') {
     h += `<div class="meta">${S.metas.map(m => `<button class="chip ${F.metaId === m.id ? 'on' : ''}" data-act="fmeta" data-v="${m.id}">${m.emoji} ${esc(m.nombre)}</button>`).join('')}</div>`;
     h += `<div class="optrow"><span>Saqué plata de esta meta</span><button class="tog ${F.retiro ? 'on' : ''}" data-act="fretiro" aria-label="Retiro"></button></div>`;
+  } else if (t === 'tarjeta') {
+    h += `<div class="optrow muted"><span>No suma como gasto: tus compras ya se contaron cuando las hiciste. En la nota poné qué tarjeta (BBVA, Visa…).</span></div>`;
+  } else if (t === 'saldo') {
+    const b = balance(mkey(today()));
+    h += `<div class="optrow"><span>¿Quién le pagó a quién?</span><div class="seg"><button class="${F.dir !== 'ella' ? 'on' : ''}" data-act="fdir" data-v="yo">Yo a ${esc(pz)}</button><button class="${F.dir === 'ella' ? 'on' : ''}" data-act="fdir" data-v="ella">${esc(pz)} a mí</button></div></div>`;
+    h += `<div class="optrow muted"><span>${Math.abs(b.debe) < 1 ? 'Ahora están a mano.' : b.debe > 0 ? `Hoy ${esc(pz)} te debe ${money(b.debe)}.` : `Hoy le debés ${money(-b.debe)}.`} No suma como gasto ni como ingreso.</span></div>`;
+  } else if (t === 'cobro') {
+    h += `<div class="fields"><label for="fQuien">¿Quién te devolvió?</label><input id="fQuien" list="dlNombres" value="${esc(F.quien)}" placeholder="Ej: Joaco" maxlength="24" autocapitalize="words"><datalist id="dlNombres">${nombresDeudores().map(x => `<option value="${esc(x)}">`).join('')}</datalist></div>`;
+    const d = deudores();
+    h += `<div class="optrow muted"><span>${d.length ? d.map(x => `${esc(x.nombre)} te debe ${money(x.monto)}`).join(' · ') + '. ' : ''}Baja lo que te deben. No cuenta como ingreso.</span></div>`;
   }
   h += `<div class="pad" id="pad">${['1', '2', '3', '4', '5', '6', '7', '8', '9', '000', '0', '⌫'].map(k => `<button data-act="key" data-v="${k}" ${k === '⌫' ? 'aria-label="Borrar"' : ''}>${k}</button>`).join('')}</div>`;
   h += `<div class="fields"><label for="fFecha">Fecha</label><input type="date" id="fFecha" value="${F.fecha}"><label for="fNota">Nota</label><input id="fNota" value="${esc(F.nota)}" placeholder="Opcional" maxlength="60"></div>`;
@@ -275,7 +389,18 @@ function vMovForm() {
   if (editing) h += `<button class="btn danger" data-act="delMov" data-id="${F.id}">Borrar</button>`;
   return h;
 }
-function syncForm() { const f = $('#fFecha'), n = $('#fNota'); if (f && f.value) F.fecha = f.value; if (n) F.nota = n.value.trim(); }
+function syncForm() {
+  const f = $('#fFecha'), n = $('#fNota'), dq = $('#fDebQ'), dm = $('#fDebM'), q = $('#fQuien');
+  if (f && f.value) F.fecha = f.value; if (n) F.nota = n.value.trim();
+  if (dq) F.debeQuien = dq.value.trim(); if (dm) F.debeMonto = dm.value.trim(); if (q) F.quien = q.value.trim();
+}
+/* Arma los datos de un gasto desde el formulario. montoCuota: lo que vale este movimiento; n: cantidad de cuotas */
+function formGasto(montoCuota, n, fo) {
+  fo = fo || F; const pz = pareja(), total = montoCuota * n;
+  let deben;
+  if (fo.debeOn) { const dm = parseNum(fo.debeMonto), tot = dm > 0 ? Math.min(dm, total) : total / 2; deben = { quien: cap((fo.debeQuien || 'Alguien').trim()), monto: Math.round(tot / n * 100) / 100 }; }
+  return { tipo: 'gasto', monto: montoCuota, categoriaId: fo.categoriaId, medio: fo.medio, compartido: !!(fo.compartido && pz), pagoPor: pz && fo.pagoPor === 'pareja' ? 'pareja' : 'yo', deben, fijoId: fo.fijoId || undefined };
+}
 function openMovForm(form) { F = form; openSheet(vMovForm()); }
 function rerenderForm() { syncForm(); const sc = $('#sheet').scrollTop; $('#sheet').innerHTML = vMovForm(); $('#sheet').scrollTop = sc; }
 function updateAmount() { const tmp = document.createElement('div'); tmp.innerHTML = vMovForm(); $('#fAmount').outerHTML = tmp.querySelector('#fAmount').outerHTML; }
@@ -285,26 +410,33 @@ function saveMov(fromChat) {
   let monto = parseNum(F.monto);
   if (!(monto > 0)) { toast('Escribí un monto'); return; }
   if (F.tipo === 'ahorro' && F.retiro) monto = -monto;
+  if (F.tipo === 'cobro' && !F.quien) { toast('Escribí quién te devolvió'); return; }
+  if (F.tipo === 'gasto' && F.debeOn && !F.debeQuien) { toast('Escribí quién te debe'); return; }
   const base = { tipo: F.tipo, fecha: F.fecha || today(), nota: F.nota || '' };
-  if (F.tipo === 'gasto') Object.assign(base, { categoriaId: F.categoriaId, medio: F.medio, compartido: !!(F.compartido && pareja()), pagoPor: F.compartido ? F.pagoPor : 'yo', fijoId: F.fijoId || undefined });
+  const nCuotas = !F.id && F.tipo === 'gasto' && F.medio === 'Tarjeta de crédito' && F.cuotas > 1 ? F.cuotas : 1;
+  if (F.tipo === 'gasto') { const g = formGasto(Math.round(monto / nCuotas * 100) / 100, nCuotas); delete g.monto; delete g.tipo; Object.assign(base, g); }
+  if (F.tipo === 'saldo') Object.assign(base, { dir: F.dir === 'ella' ? 'ella' : 'yo' });
+  if (F.tipo === 'cobro') Object.assign(base, { quien: cap(F.quien.trim()) });
   if (F.tipo === 'ingreso') Object.assign(base, { fuente: F.fuente, medio: F.medio || 'Transferencia', auto: !!F.auto && F.fuente !== 'otros' });
   if (F.tipo === 'ahorro') Object.assign(base, { metaId: F.metaId });
 
   if (F.id) {
     const m = S.movimientos.find(x => x.id === F.id);
-    if (m) { Object.assign(m, base, { monto }); if (m.tipo === 'ingreso') autoAhorro(m); }
+    if (m) { if (m.tipo === 'gasto' && !base.deben) delete m.deben; Object.assign(m, base, { monto }); if (!m.deben) delete m.deben; if (m.tipo === 'ingreso') autoAhorro(m); }
     toast('✓ Cambios guardados');
-  } else if (F.tipo === 'gasto' && F.medio === 'Tarjeta de crédito' && F.cuotas > 1) {
-    const g = uid(), n = F.cuotas, cuota = Math.round(monto / n * 100) / 100;
+  } else if (nCuotas > 1) {
+    const g = uid(), n = nCuotas, cuota = Math.round(monto / n * 100) / 100;
+    if (!base.deben) delete base.deben;
     for (let i = 0; i < n; i++) S.movimientos.push({ ...base, id: uid(), monto: cuota, cuotas: n, cuotaNumero: i + 1, grupoId: g, fecha: addMonths(base.fecha, i), creado: Date.now() + i });
     toast(`✓ Guardado en ${n} cuotas de ${money(cuota)}`);
   } else {
     const m = { ...base, id: uid(), monto, creado: Date.now() };
+    if (!m.deben) delete m.deben;
     S.movimientos.push(m);
     if (m.tipo === 'ingreso') autoAhorro(m);
     toast('✓ Guardado: ' + money(Math.abs(monto)));
   }
-  if (F.tipo === 'gasto') S.config.ultimoMedio = F.medio;
+  if (F.tipo === 'gasto' && F.medio !== 'Tarjeta de crédito') S.config.ultimoMedio = F.medio;
   save(); haptic(); closeSheet(); render();
 }
 function askDelete(id) {
@@ -322,15 +454,17 @@ function askDelete(id) {
 /* ---------- Vistas ---------- */
 let ui = { mes: null, fCat: '', fMedio: '', fComp: false };
 function rowMov(m, conFecha) {
-  const v = movVisual(m), sh = m.compartido && pareja();
+  const v = movVisual(m), sh = m.compartido && pareja(), pz = pareja();
   const sub = [];
   if (conFecha) sub.push(relDay(m.fecha));
-  if (m.tipo === 'gasto') { if (!conFecha) sub.push(m.fijoId ? 'Gasto fijo' : cat(m.categoriaId).nombre); sub.push(m.compartido && m.pagoPor === 'pareja' ? 'Pagó ' + pareja() : (MEDIO_CORTO[m.medio] || m.medio)); }
+  if (m.tipo === 'gasto') { if (!conFecha) sub.push(m.fijoId ? 'Gasto fijo' : cat(m.categoriaId).nombre); sub.push(pz && m.pagoPor === 'pareja' ? 'Pagó ' + pz : (MEDIO_CORTO[m.medio] || m.medio)); if (m.deben) sub.push(`${m.deben.quien} te debe ${money(m.deben.monto)}`); }
+  if (esOtro(m.tipo)) sub.push(m.tipo === 'tarjeta' ? 'No es gasto' : m.tipo === 'saldo' ? 'Saldaron cuentas' : 'Baja lo que te debe');
   if (m.tipo === 'ingreso') { sub.push('Ingreso'); if (m.auto && m.fuente !== 'otros') sub.push('con ahorro'); }
   if (m.tipo === 'ahorro') sub.push((m.monto < 0 ? 'Retiro de ' : 'A ') + (meta(m.metaId)?.nombre || 'meta'));
   const sign = m.tipo === 'ingreso' ? '+' : m.tipo === 'gasto' ? '−' : '';
-  const cls = m.tipo === 'ingreso' ? 'in' : m.tipo === 'ahorro' ? 'sav' : '';
-  return `<div class="row tap" data-act="edit" data-id="${m.id}"><div class="ico" style="--c:var(--${v.c})">${v.e}</div><div class="txt"><div class="t1">${esc(movTitulo(m))}${sh ? ' <span class="tag">Compartido</span>' : ''}</div><div class="t2">${esc(sub.join(' · '))}</div></div><div class="amt num ${cls}">${m.tipo === 'ahorro' && m.monto < 0 ? '−' : sign}${money(Math.abs(m.monto), m.monto % 1 !== 0)}${sh ? `<small>tu parte ${money(parteMia(m))}</small>` : ''}</div></div>`;
+  const cls = m.tipo === 'ingreso' ? 'in' : m.tipo === 'ahorro' ? 'sav' : esOtro(m.tipo) ? 'otro' : '';
+  const pm = m.tipo === 'gasto' ? parteMia(m) : 0, verParte = m.tipo === 'gasto' && Math.abs(pm - m.monto) >= 0.5;
+  return `<div class="row tap" data-act="edit" data-id="${m.id}"><div class="ico" style="--c:var(--${v.c})">${v.e}</div><div class="txt"><div class="t1">${esc(movTitulo(m))}${sh ? ' <span class="tag">Compartido</span>' : ''}</div><div class="t2">${esc(sub.join(' · '))}</div></div><div class="amt num ${cls}">${m.tipo === 'ahorro' && m.monto < 0 ? '−' : sign}${money(Math.abs(m.monto), m.monto % 1 !== 0)}${verParte ? `<small>tu parte ${money(pm)}</small>` : ''}</div></div>`;
 }
 function swipeRow(m, conFecha) { return `<div class="sw" data-id="${m.id}"><div class="acts"><button class="a-edit" data-act="edit" data-id="${m.id}">Editar</button><button class="a-del" data-act="delMov" data-id="${m.id}">Borrar</button></div>${rowMov(m, conFecha)}</div>`; }
 
@@ -346,12 +480,15 @@ function vInicio() {
   else if (r.disp < 0 && r.ing > 0) h += `<div class="perday warn">Este mes ya salió más de lo que entró</div>`;
   h += `<div class="formula num"><span>Ingresos</span><span>${money(r.ing)}</span><span>− Ahorro</span><span>${money(r.aho)}</span><span>− Gastos fijos</span><span>${money(r.fij + r.pend)}</span><span>− Gastos del día a día</span><span>${money(r.vari)}</span><span class="tot">Te queda</span><span class="tot">${money(r.disp)}</span></div></div>`;
 
-  if (pz) {
-    const b = balance(k);
-    if (b.list.length) {
-      const t = Math.abs(b.debe) < 1 ? `Están a mano con ${esc(pz)}` : b.debe > 0 ? `${esc(pz)} te debe <b class="pos num">${money(b.debe)}</b>` : `Le debés a ${esc(pz)} <b class="neg num">${money(-b.debe)}</b>`;
-      h += `<h2>Con ${esc(pz)}</h2><a class="card mel" href="#cierre"><div class="ico" style="--c:var(--c7)">👫</div><div class="txt"><div class="t1">${t}</div><div class="t2">${S.cierres[k] ? 'Saldado' : 'Gastos compartidos de ' + monthName(k)}</div></div><span class="chev">›</span></a>`;
+  const bp = pz ? balance(k) : null, ds = deudores();
+  if ((bp && bp.hay) || ds.length) {
+    h += `<h2>Cuentas pendientes</h2><div class="card list-card">`;
+    if (bp && bp.hay) {
+      const t = Math.abs(bp.debe) < 1 ? `Están a mano con ${esc(pz)}` : bp.debe > 0 ? `${esc(pz)} te debe <b class="pos num">${money(bp.debe)}</b>` : `Le debés a ${esc(pz)} <b class="neg num">${money(-bp.debe)}</b>`;
+      h += `<a class="row tap" href="#cierre"><div class="ico" style="--c:var(--c7)">👫</div><div class="txt"><div class="t1">${t}</div><div class="t2">Ver detalle y saldar</div></div><span class="chev">›</span></a>`;
     }
+    for (const x of ds) h += `<button class="row tap" data-act="cobrar" data-v="${esc(x.nombre)}" data-id="${Math.round(Math.max(0, x.monto))}"><div class="ico" style="--c:var(--c8)">🙋</div><div class="txt"><div class="t1">${x.monto > 0 ? `${esc(x.nombre)} te debe <b class="pos num">${money(x.monto)}</b>` : `Le debés a ${esc(x.nombre)} <b class="neg num">${money(-x.monto)}</b>`}</div><div class="t2">${x.monto > 0 ? 'Tocá cuando te devuelva' : 'Te devolvió de más'}</div></div><span class="chev">›</span></button>`;
+    h += `</div>`;
   }
   const pend = pendientes(k);
   if (pend.length) {
@@ -371,7 +508,7 @@ function vMovimientos() {
   let list = sortMovs(movsMes(k));
   if (ui.fCat) list = list.filter(m => m.tipo === 'gasto' && m.categoriaId === ui.fCat);
   if (ui.fMedio) list = list.filter(m => m.medio === ui.fMedio);
-  if (ui.fComp) list = list.filter(m => m.compartido);
+  if (ui.fComp) list = list.filter(m => tocaPareja(m) || m.deben || m.tipo === 'cobro');
   const [y] = k.split('-');
   let h = `<h1>Movimientos</h1><div class="monthbar"><button data-act="mes" data-v="-1" aria-label="Mes anterior">‹</button><b>${cap(monthName(k))} ${y}</b><button data-act="mes" data-v="1" aria-label="Mes siguiente">›</button></div>`;
   h += `<div class="chips"><select class="chip ${ui.fCat ? 'on' : ''}" id="selCat" aria-label="Filtrar por categoría"><option value="">Categoría ▾</option>${S.categorias.map(c => `<option value="${c.id}" ${ui.fCat === c.id ? 'selected' : ''}>${c.emoji} ${esc(c.nombre)}</option>`).join('')}</select><select class="chip ${ui.fMedio ? 'on' : ''}" id="selMedio" aria-label="Filtrar por medio de pago"><option value="">Medio de pago ▾</option>${MEDIOS.map(x => `<option ${ui.fMedio === x ? 'selected' : ''}>${x}</option>`).join('')}</select>${pareja() ? `<button class="chip ${ui.fComp ? 'on' : ''}" data-act="fcompfil">👫 Compartidos</button>` : ''}</div>`;
@@ -387,15 +524,17 @@ function vMovimientos() {
 }
 
 function vCierre() {
-  const k = ui.mes && ui.mesCierre ? ui.mesCierre : mkey(today()), pz = pareja() || 'tu pareja';
-  const b = balance(k), done = S.cierres[k];
-  let h = `<a class="back" href="#inicio">‹ Inicio</a><h1>Cierre con ${esc(pz)}</h1>`;
-  if (!b.list.length) return h + `<div class="empty">Todavía no hay gastos compartidos en ${monthName(k)}. Al cargar un gasto, prendé "Compartido con ${esc(pz)}" o escribí su nombre, por ejemplo "18000 super ${esc(norm(pz))}".</div>`;
-  const pos = b.debe >= 0, mi = S.config.miParte;
-  h += `<div class="card owe"><div class="t2">${cap(monthName(k))} · ${mi === 50 ? 'mitad y mitad' : `vos ${mi} %, ${esc(pz)} ${100 - mi} %`}</div><div class="big num ${Math.abs(b.debe) < 1 ? '' : pos ? 'pos' : 'neg'}">${money(Math.abs(b.debe))}</div><div style="font-size:17px;font-weight:600">${Math.abs(b.debe) < 1 ? 'Están a mano' : pos ? esc(pz) + ' te debe' : 'Le debés a ' + esc(pz)}</div>`;
-  h += `<div class="who num"><div>Pagaste vos<b>${money(b.yo)}</b></div><div>Pagó ${esc(pz)}<b>${money(b.ella)}</b></div></div><div class="t2 num" style="margin-top:12px;white-space:normal">Total compartido ${money(b.total)} · a vos te toca ${money(b.total * mi / 100)}</div>${done ? '<span class="done-badge">✓ Saldado</span>' : ''}</div>`;
-  h += `<h2>Gastos compartidos</h2><div class="card list-card">${b.list.map(m => { const c = cat(m.categoriaId); return `<div class="row tap" data-act="edit" data-id="${m.id}"><div class="ico" style="--c:var(--${c.color})">${c.emoji}</div><div class="txt"><div class="t1">${esc(movTitulo(m))}</div><div class="t2">${m.pagoPor === 'pareja' ? 'Pagó ' + esc(pz) : 'Pagaste vos'} · ${relDay(m.fecha)}</div></div><div class="amt num">${money(m.monto)}</div></div>`; }).join('')}</div>`;
-  h += `<div class="stack" style="margin-top:16px"><button class="btn" data-act="copiarCierre">Copiar resumen para mandarle</button><button class="btn ghost" data-act="saldar">${done ? 'Marcar como pendiente' : 'Marcar como saldado'}</button></div>`;
+  const k = mkey(today()), pz = pareja() || 'tu pareja';
+  const b = balance(k);
+  let h = `<a class="back" href="#inicio">‹ Inicio</a><h1>Cuentas con ${esc(pz)}</h1>`;
+  if (!b.hay) return h + `<div class="empty">Todavía no hay gastos compartidos. Al cargar un gasto, prendé "Compartido con ${esc(pz)}" o escribí su nombre, por ejemplo "18000 super ${esc(norm(pz))}".</div>`;
+  const pos = b.debe >= 0, cero = Math.abs(b.debe) < 1, mi = S.config.miParte;
+  h += `<div class="card owe"><div class="t2">Hasta hoy · ${mi === 50 ? 'mitad y mitad' : `vos ${mi} %, ${esc(pz)} ${100 - mi} %`}</div><div class="big num ${cero ? '' : pos ? 'pos' : 'neg'}">${money(Math.abs(b.debe))}</div><div style="font-size:17px;font-weight:600">${cero ? 'Están a mano' : pos ? esc(pz) + ' te debe' : 'Le debés a ' + esc(pz)}</div>`;
+  if (b.total) h += `<div class="who num"><div>Pagaste vos<b>${money(b.yo)}</b></div><div>Pagó ${esc(pz)}<b>${money(b.ella)}</b></div></div><div class="t2 num" style="margin-top:12px;white-space:normal">Compartido en ${monthName(k)}: ${money(b.total)} · a vos te toca ${money(b.total * mi / 100)}</div>`;
+  h += `</div>`;
+  if (b.list.length) h += `<h2>Movimientos de ${monthName(k)}</h2><div class="card list-card">${b.list.map(m => rowMov(m, true)).join('')}</div>`;
+  else h += `<div class="empty">En ${monthName(k)} todavía no hay movimientos con ${esc(pz)}.</div>`;
+  h += `<div class="stack" style="margin-top:16px"><button class="btn" data-act="copiarCierre">Copiar resumen para mandarle</button>${cero ? '' : `<button class="btn ghost" data-act="saldar">Anotar que saldamos ${money(Math.abs(b.debe))}</button>`}</div>`;
   return h;
 }
 
@@ -550,7 +689,7 @@ function vAjustes() {
   h += `<p class="foot">${lr ? 'Última copia: ' + relDay(lr).toLowerCase().replace(/^(lunes|martes|miércoles|jueves|viernes|sábado|domingo) /, 'el ') : 'Todavía no guardaste ninguna copia'}. Tus datos quedan solo en este iPhone.</p>`;
   h += `<h2>Apariencia</h2><div class="list"><div class="li static"><span class="txt">Tema</span><div class="seg">${[['auto', 'Auto'], ['light', 'Claro'], ['dark', 'Oscuro']].map(([v, l]) => `<button class="${c.tema === v ? 'on' : ''}" data-act="tema" data-v="${v}">${l}</button>`).join('')}</div></div></div>`;
   h += `<h2>Datos</h2><div class="list"><button class="li" data-act="ejemplo"><span class="txt">Probar con datos de ejemplo</span><span class="chev">›</span></button><button class="li" data-act="borrarTodo"><span class="txt" style="color:var(--out)">Borrar todos los datos</span></button></div>`;
-  h += `<p class="foot">Plata Clara · versión 1.0</p>`;
+  h += `<p class="foot">Plata Clara · versión 1.1</p>`;
   return h;
 }
 function vFijos() {
@@ -662,10 +801,10 @@ async function exportar() {
 async function exportarCSV() {
   const q = v => { v = String(v ?? ''); return /[;"\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };
   const num = n => String(Math.round(n * 100) / 100).replace('.', ',');
-  const rows = [['Fecha', 'Tipo', 'Categoría / Fuente / Meta', 'Detalle', 'Monto', 'Tu parte', 'Medio de pago', 'Cuota', 'Compartido', 'Pagó']];
+  const rows = [['Fecha', 'Tipo', 'Categoría / Fuente / Meta', 'Detalle', 'Monto', 'Tu parte', 'Medio de pago', 'Cuota', 'Compartido', 'Pagó', 'Te debe', 'Cuánto te debe']];
   for (const m of sortMovs(S.movimientos).reverse()) {
-    const grupo = m.tipo === 'gasto' ? cat(m.categoriaId).nombre : m.tipo === 'ingreso' ? (FUENTES[m.fuente]?.nombre || '') : (meta(m.metaId)?.nombre || '');
-    rows.push([m.fecha.split('-').reverse().join('/'), cap(m.tipo), grupo, movTitulo(m), num(m.monto), num(m.tipo === 'gasto' ? parteMia(m) : m.monto), m.medio || '', m.cuotas > 1 ? `${m.cuotaNumero}/${m.cuotas}` : '', m.compartido ? 'Sí' : '', m.compartido ? (m.pagoPor === 'pareja' ? pareja() : 'Yo') : '']);
+    const grupo = m.tipo === 'gasto' ? cat(m.categoriaId).nombre : m.tipo === 'ingreso' ? (FUENTES[m.fuente]?.nombre || '') : esOtro(m.tipo) ? TIPOS_OTRO[m.tipo].nombre : (meta(m.metaId)?.nombre || '');
+    rows.push([m.fecha.split('-').reverse().join('/'), esOtro(m.tipo) ? 'No es gasto' : cap(m.tipo), grupo, movTitulo(m), num(m.monto), num(m.tipo === 'gasto' ? parteMia(m) : esOtro(m.tipo) ? 0 : m.monto), m.medio || '', m.cuotas > 1 ? `${m.cuotaNumero}/${m.cuotas}` : '', m.compartido ? 'Sí' : '', m.tipo === 'gasto' ? (m.pagoPor === 'pareja' ? pareja() : 'Yo') : '', m.deben ? m.deben.quien : '', m.deben ? num(m.deben.monto) : '']);
   }
   await shareOrDownload(`plata-clara-${today()}.csv`, '﻿' + rows.map(r => r.map(q).join(';')).join('\r\n'), 'text/csv');
 }
@@ -751,7 +890,7 @@ function renderExamples() {
   const ex = $('#examples'), pz = pareja();
   const show = !$('#chatIn').value.trim() && S.movimientos.filter(m => !S.config.ejemplo).length < 25;
   ex.hidden = !show;
-  if (show) ex.innerHTML = ['3500 super', '45000 zapatillas tarjeta 3', pz ? `18000 delivery mp ${norm(pz).slice(0, 4)}` : '18000 delivery mp', '200000 fecha dj', '2400000 sueldo'].map(t => `<button type="button">${esc(t)}</button>`).join('');
+  if (show) ex.innerHTML = ['3500 super', pz ? `45000 super ${norm(pz).slice(0, 4)}` : '45000 super', '272700 traje 6 cuotas debe joaco', pz ? `30000 super pago ${norm(pz).slice(0, 4)}` : '18000 delivery mp', '845000 pague tarjeta bbva', '200000 fecha dj'].map(t => `<button type="button">${esc(t)}</button>`).join('');
 }
 
 /* Chat */
@@ -762,7 +901,14 @@ function chatPreview() {
   if (!chatF) return;
   const f = chatF, n = parseNum(f.monto);
   let e, c, t1, bits = [relDay(f.fecha)], amt;
-  if (f.tipo === 'gasto') { const k = cat(f.categoriaId); e = k.emoji; c = k.color; t1 = f.nota || k.nombre; bits.push(k.nombre !== t1 ? k.nombre : null, f.compartido && f.pagoPor === 'pareja' ? 'Pagó ' + pareja() : (MEDIO_CORTO[f.medio] || f.medio)); if (f.cuotas > 1) bits.push(`${f.cuotas} cuotas de ${money(n / f.cuotas)}`); if (f.compartido) bits.push('Compartido'); amt = '−' + money(n) + (f.compartido ? `<small>tu parte ${money(n * S.config.miParte / 100)}</small>` : ''); }
+  if (f.tipo === 'gasto') {
+    const k = cat(f.categoriaId), cu = f.medio === 'Tarjeta de crédito' && f.cuotas > 1 ? f.cuotas : 1, g = formGasto(n / cu, cu, f), pm = parteMia(g) * cu;
+    e = k.emoji; c = k.color; t1 = f.nota || k.nombre;
+    bits.push(k.nombre !== t1 ? k.nombre : null, f.pagoPor === 'pareja' && pareja() ? 'Pagó ' + pareja() : (MEDIO_CORTO[f.medio] || f.medio));
+    if (cu > 1) bits.push(`${cu} cuotas de ${money(n / cu)}`); if (g.compartido) bits.push('Con ' + pareja()); if (g.deben) bits.push(`${g.deben.quien} te debe ${money(g.deben.monto * cu)}`);
+    amt = '−' + money(n) + (Math.abs(pm - n) >= 0.5 ? `<small>tu parte ${money(pm)}</small>` : '');
+  }
+  else if (esOtro(f.tipo)) { const o = TIPOS_OTRO[f.tipo]; e = o.emoji; c = o.color; t1 = movTitulo({ ...f, monto: n }); bits.push(f.tipo === 'tarjeta' ? 'No suma como gasto' : f.tipo === 'saldo' ? 'Saldan cuentas' : 'Baja lo que te debe'); amt = money(n); }
   else if (f.tipo === 'ingreso') { const s = FUENTES[f.fuente]; e = s.emoji; c = s.color; t1 = f.nota || s.nombre; bits.push('Ingreso'); const tx = f.auto ? autoAhorroTexto(f.fuente) : ''; if (tx) bits.push(tx); amt = '+' + money(n); }
   else { const m = meta(f.metaId); e = m?.emoji || '🐷'; c = 'accent'; t1 = f.nota || 'Ahorro'; bits.push('A ' + (m?.nombre || 'meta')); amt = money(n); }
   $('#preview').innerHTML = `<span class="ico" style="--c:var(--${c})">${e}</span><span class="txt"><span class="t1" style="display:block">${esc(t1)}</span><span class="t2" style="display:block">${esc(bits.filter(Boolean).join(' · '))}</span><span class="edit">Tocá para ajustar</span></span><span class="amt num ${f.tipo === 'ingreso' ? 'in' : f.tipo === 'ahorro' ? 'sav' : ''}">${amt}</span>`;
@@ -800,7 +946,13 @@ document.addEventListener('click', e => {
     case 'edit': { const m = S.movimientos.find(x => x.id === id); if (m) openMovForm(formFromMov(m)); break; }
     case 'delMov': askDelete(id); break;
     case 'saveMov': saveMov(); break;
-    case 'ftipo': F.tipo = v; if (v === 'ingreso') { F.medio = 'Transferencia'; F.auto = true; } else if (v === 'gasto') F.medio = S.config.ultimoMedio || 'Débito'; rerenderForm(); break;
+    case 'ftipo': {
+      F.tipo = v; if (v === 'ingreso') { F.medio = 'Transferencia'; F.auto = true; } else if (v === 'gasto') F.medio = S.config.ultimoMedio || 'Débito';
+      if (v === 'saldo' && !parseNum(F.monto)) { const b = balance(mkey(today())); if (Math.abs(b.debe) >= 1) { F.monto = String(Math.round(Math.abs(b.debe))); F.dir = b.debe > 0 ? 'ella' : 'yo'; } }
+      rerenderForm(); break;
+    }
+    case 'fdebe': F.debeOn = !F.debeOn; rerenderForm(); break;
+    case 'fdir': F.dir = v; rerenderForm(); break;
     case 'fcat': F.categoriaId = v; rerenderForm(); break;
     case 'fmedio': F.medio = v; if (v !== 'Tarjeta de crédito') F.cuotas = 1; rerenderForm(); break;
     case 'fcuota': F.cuotas = Math.max(1, Math.min(48, F.cuotas + Number(v))); rerenderForm(); break;
@@ -814,10 +966,12 @@ document.addEventListener('click', e => {
     case 'pagar': { const f = S.fijos.find(x => x.id === id); if (!f) break; const fm = blankForm('gasto'); Object.assign(fm, { monto: String(f.monto), categoriaId: f.categoriaId, fijoId: f.id, nota: f.nombre, compartido: !!(f.compartido && pareja()), medio: S.config.ultimoMedio }); openMovForm(fm); break; }
     case 'mes': ui.mes = shiftMonth(ui.mes || mkey(today()), Number(v)); render(); break;
     case 'fcompfil': ui.fComp = !ui.fComp; render(); break;
-    case 'saldar': { const k = mkey(today()); S.cierres[k] = !S.cierres[k]; save(); render(); toast(S.cierres[k] ? '✓ Marcado como saldado' : 'Marcado como pendiente'); break; }
+    case 'saldar': { const b = balance(mkey(today())); if (Math.abs(b.debe) < 1) break; const fm = blankForm('saldo'); fm.monto = String(Math.round(Math.abs(b.debe))); fm.dir = b.debe > 0 ? 'ella' : 'yo'; openMovForm(fm); break; }
+    case 'cobrar': { const fm = blankForm('cobro'); fm.quien = v; if (Number(id) > 0) fm.monto = String(id); openMovForm(fm); break; }
     case 'copiarCierre': {
       const k = mkey(today()), b = balance(k), pz = pareja() || 'vos';
-      const txt = `Gastos compartidos de ${monthName(k)}:\n` + b.list.map(m => `• ${movTitulo(m)}: ${money(m.monto)} (pagó ${m.pagoPor === 'pareja' ? pz : 'Santiago'})`).join('\n') + `\n\nTotal: ${money(b.total)}\n` + (Math.abs(b.debe) < 1 ? 'Estamos a mano 🙌' : b.debe > 0 ? `Me debés ${money(b.debe)} 🙂` : `Te debo ${money(-b.debe)} 🙂`);
+      const det = m => m.tipo === 'saldo' ? `• ${m.dir === 'ella' ? 'Me pagaste' : 'Te pagué'}: ${money(m.monto)}` : `• ${movTitulo(m)}: ${money(m.monto)} (${m.pagoPor === 'pareja' ? 'pagaste vos' : 'pagué yo'}${m.compartido ? ', a medias' : ', era mío'})`;
+      const txt = `Cuentas de ${monthName(k)}:\n` + b.list.map(det).join('\n') + `\n\n` + (Math.abs(b.debe) < 1 ? 'Estamos a mano 🙌' : b.debe > 0 ? `En total me debés ${money(b.debe)} 🙂` : `En total te debo ${money(-b.debe)} 🙂`);
       const done = () => toast('✓ Copiado: pegalo en WhatsApp');
       if (navigator.share) navigator.share({ text: txt }).catch(() => { }); else if (navigator.clipboard) navigator.clipboard.writeText(txt).then(done, () => toast('No pude copiar'));
       break;

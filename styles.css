@@ -245,3 +245,6 @@ body.kbopen .tabs{display:none}
 .toast{position:fixed;top:calc(12px + env(safe-area-inset-top,0px));left:50%;transform:translate(-50%,-180%);background:var(--fg);color:var(--bg);padding:12px 20px;border-radius:999px;font-weight:600;font-size:15px;z-index:60;transition:transform .3s;max-width:92vw;text-align:center;white-space:nowrap}
 .toast.on{transform:translate(-50%,0)}
 .hap{position:absolute;left:-9999px;top:0;opacity:0;pointer-events:none}
+/* v1.1: filas tocables como botón/enlace y movimientos que no son gasto */
+button.row,a.row{width:100%;border:none;text-align:left;font-size:inherit;color:inherit;text-decoration:none;font-family:inherit}
+.amt.otro{color:var(--muted)}
