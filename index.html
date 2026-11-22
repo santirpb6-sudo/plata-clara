@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Plata Clara</title>
+<meta name="description" content="Tus gastos, tu presupuesto y tus metas de ahorro, en tu iPhone.">
+<meta name="theme-color" content="#F2F4F5" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0B0F10" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Plata Clara">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<main class="app" id="app"></main>
+
+<div class="chat" id="chat" hidden>
+  <div class="in">
+    <button type="button" class="preview" id="preview" hidden></button>
+    <div class="examples" id="examples"></div>
+    <form class="bubble" id="chatForm" autocomplete="off">
+      <button type="button" class="round kb" aria-label="Cargar con teclado de números" data-act="nuevo">🔢</button>
+      <input id="chatIn" placeholder="Ej: 3500 super" enterkeyhint="send" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="Anotá un movimiento">
+      <button class="round send" id="sendBtn" aria-label="Guardar" disabled>↑</button>
+    </form>
+  </div>
+</div>
+
+<nav class="tabs" aria-label="Secciones"><div class="nav">
+  <a href="#inicio" data-s="inicio"><span class="ti">🏠</span>Inicio</a>
+  <a href="#movimientos" data-s="movimientos"><span class="ti">📋</span>Movimientos</a>
+  <a href="#resumen" data-s="resumen"><span class="ti">📊</span>Resumen</a>
+  <a href="#metas" data-s="metas"><span class="ti">🎯</span>Metas</a>
+  <a href="#ajustes" data-s="ajustes"><span class="ti">⚙️</span>Ajustes</a>
+</div></nav>
+
+<div class="scrim" id="scrim"></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true"></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<label class="hap" id="hap" aria-hidden="true"><input type="checkbox" switch tabindex="-1"></label>
+<input type="file" id="fileIn" accept="application/json,.json" hidden>
+
+<script src="app.js"></script>
+</body>
+</html>
