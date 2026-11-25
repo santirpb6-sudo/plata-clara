@@ -193,7 +193,7 @@ select.chip{padding-right:14px}
 
 /* Pestañas */
 .tabs{position:fixed;left:0;right:0;bottom:0;background:var(--tab);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid var(--line);z-index:30;padding-bottom:env(safe-area-inset-bottom,0px);padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
-.tabs .nav{max-width:430px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr)}
+.tabs .nav{max-width:430px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr)}
 .tabs a{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 0 6px;font-size:10px;font-weight:500;color:var(--muted);text-decoration:none;min-height:54px}
 .tabs a .ti{font-size:22px;line-height:1;filter:grayscale(1);opacity:.6}
 .tabs a.on{color:var(--accent)} .tabs a.on .ti{filter:none;opacity:1}
@@ -248,3 +248,34 @@ body.kbopen .tabs{display:none}
 /* v1.1: filas tocables como botón/enlace y movimientos que no son gasto */
 button.row,a.row{width:100%;border:none;text-align:left;font-size:inherit;color:inherit;text-decoration:none;font-family:inherit}
 .amt.otro{color:var(--muted)}
+
+/* v1.3 */
+.hrow{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.hrow h1{margin-bottom:12px}
+.gear{width:44px;height:44px;border-radius:50%;background:var(--card);display:flex;align-items:center;justify-content:center;font-size:20px;text-decoration:none;box-shadow:var(--shadow);margin-bottom:12px;flex-shrink:0}
+.hero:not(.open) .formula{display:none}
+.detbtn{display:block;background:none;border:none;padding:10px 0 0;margin:6px 0 0;font-size:15px;font-weight:600;color:var(--accent);cursor:pointer;min-height:44px;text-align:left}
+.card.tab{padding:14px 10px 12px}
+.stk{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px;align-items:end}
+.stk button{display:flex;flex-direction:column;align-items:center;gap:6px;padding:6px 2px;border-radius:12px;border:2px solid transparent;background:none;font:inherit;cursor:pointer;min-width:0}
+.stk button.on{border-color:var(--accent);background:var(--accent-soft)}
+.stk .num{font-size:11px;font-weight:700;white-space:nowrap}
+.stk .num.neg{color:var(--out)}
+.stk .col{width:100%;display:flex;flex-direction:column;justify-content:flex-end;border-radius:8px;overflow:hidden}
+.stk .col i{display:block;flex-shrink:0}
+.stk button.on .col i:first-child{background:var(--card)!important}
+.stk .mlab{font-size:12px;color:var(--muted)}
+.card.tab .key{margin-top:10px;padding:0 6px}
+.list-card .row.tot .t1{font-weight:700}
+.list-card .row.tot .amt{font-size:17px;font-weight:800}
+.list-card .amt.cuo{color:var(--c4)}
+.list-card .amt.pos{color:var(--in)}
+.kpis.k3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.kpis.k3 .kpi .v{font-size:22px}
+.cbars{display:flex;flex-direction:column;gap:12px;margin-top:16px}
+.cbars button{display:block;width:100%;background:none;border:none;padding:0;font:inherit;text-align:left;cursor:pointer;color:inherit}
+.cbars .bar .n{background:var(--c6)}
+.card.tab .key i{width:10px;height:10px;border-radius:3px}
+.tabhead{display:flex;justify-content:space-between;align-items:center;padding:14px 0 10px;border-bottom:1px solid var(--line);font-size:18px}
+.tabhead a{font-size:15px;font-weight:600;color:var(--accent);text-decoration:none;min-height:44px;display:flex;align-items:center}
+.sref{width:140px;min-height:40px;border-radius:10px;border:1px solid var(--line);background:var(--bg);padding:0 10px;text-align:right;font-weight:600}
