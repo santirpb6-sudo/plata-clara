@@ -174,7 +174,7 @@ function cuInfo(fo, n) {
   if (desde > 1) return { cu: fo.cuotas - desde + 1, per: n, desde, tot: fo.cuotas };
   return { cu: fo.cuotas, per: n / fo.cuotas, desde: 1, tot: fo.cuotas };
 }
-function sueldoRef() { if (S.config.sueldoRef > 0) return S.config.sueldoRef; const s = sortMovs(S.movimientos.filter(m => m.tipo === 'ingreso' && m.fuente === 'sueldo' && m.fecha <= today()))[0]; return s ? s.monto : 0; }
+function sueldoRef(k) { if (S.config.sueldoRef > 0) return S.config.sueldoRef; k = k || mkey(today()); const s = sortMovs(S.movimientos.filter(m => m.tipo === 'ingreso' && m.fuente === 'sueldo' && (m.fecha <= today() || mkey(m.fecha) <= k)))[0]; return s ? s.monto : 0; }
 const movsMes = k => S.movimientos.filter(m => mkey(m.fecha) === k);
 const sortMovs = arr => arr.slice().sort((a, b) => b.fecha.localeCompare(a.fecha) || (b.creado || 0) - (a.creado || 0));
 
@@ -198,7 +198,7 @@ function pendientes(k) {
 function compromisos(k) {
   const fij = S.fijos.filter(f => fijoToca(f, k)).map(f => ({ n: f.nombre, s: (Number(f.frec) || 1) > 1 || f.varia || f.hasta ? [(Number(f.frec) || 1) > 1 ? FREC_TXT[f.frec] : '', f.varia ? 'promedio' : '', f.hasta ? 'hasta ' + mes3(f.hasta) + ' ' + f.hasta.slice(2, 4) : ''].filter(Boolean).join(' · ') : '', v: fijoParte(f) }));
   const cuo = S.movimientos.filter(m => m.tipo === 'gasto' && m.medio === 'Tarjeta de crédito' && mkey(m.fecha) === k).map(m => ({ n: m.nota || cat(m.categoriaId).nombre, s: [tarjeta(tarjetaDe(m))?.nombre, m.cuotas > 1 ? m.cuotaNumero + '/' + m.cuotas : ''].filter(Boolean).join(' · '), v: costo(m) }));
-  const ref = sueldoRef(), aho = ref * (S.config.ahorroPct || 0) / 100;
+  const ref = sueldoRef(k), aho = ref * (S.config.ahorroPct || 0) / 100;
   const tf = fij.reduce((a, x) => a + x.v, 0), tc = cuo.reduce((a, x) => a + x.v, 0);
   return { k, ref, aho, fij, cuo, tf, tc, libre: ref - aho - tf - tc };
 }
@@ -822,7 +822,7 @@ function vAjustes() {
   h += `<p class="foot">${lr ? 'Última copia: ' + relDay(lr).toLowerCase().replace(/^(lunes|martes|miércoles|jueves|viernes|sábado|domingo) /, 'el ') : 'Todavía no guardaste ninguna copia'}. Tus datos quedan solo en este iPhone.</p>`;
   h += `<h2>Apariencia</h2><div class="list"><div class="li static"><span class="txt">Tema</span><div class="seg">${[['auto', 'Auto'], ['light', 'Claro'], ['dark', 'Oscuro']].map(([v, l]) => `<button class="${c.tema === v ? 'on' : ''}" data-act="tema" data-v="${v}">${l}</button>`).join('')}</div></div></div>`;
   h += `<h2>Datos</h2><div class="list"><button class="li" data-act="ejemplo"><span class="txt">Probar con datos de ejemplo</span><span class="chev">›</span></button><button class="li" data-act="borrarTodo"><span class="txt" style="color:var(--out)">Borrar todos los datos</span></button></div>`;
-  h += `<p class="foot">Plata Clara · versión 1.3</p>`;
+  h += `<p class="foot">Plata Clara · versión 1.3.1</p>`;
   return h;
 }
 function vCats() {
